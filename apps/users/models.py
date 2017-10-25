@@ -14,7 +14,7 @@ class UserProfile(AbstractUser):
     gender = models.CharField(max_length=6, choices=(("male", u"男"), ("female", u"女")), default="female")
     address = models.CharField(max_length=100, default="")
     mobile = models.CharField(max_length=11, null=True, blank=True)
-    image = models.ImageField(upload_to="image/%Y/%m", default="image/default.png")
+    image = models.ImageField(upload_to="resources/image/%Y/%m", default="resources/image/default.png")
 
     class Meta:
         verbose_name = u"用户信息"
@@ -46,7 +46,7 @@ class EmailVerifyRecord(models.Model):
 # 首页轮播模型
 class Banner(models.Model):
     title = models.CharField(max_length=100, verbose_name=u"标题")
-    image = models.ImageField(upload_to="banner/%Y/%m", verbose_name=u"轮播图")
+    image = models.ImageField(upload_to="resources/banner/%Y/%m", verbose_name=u"轮播图")
     url = models.URLField(max_length=200, verbose_name=u"访问地址")
     index = models.IntegerField(default=100, verbose_name=u"顺序")
     add_time = models.DateTimeField(default=datetime.now, verbose_name=u"添加时间")
