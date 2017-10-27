@@ -31,6 +31,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Application definition
+AUTHENTICATION_BACKENDS = (  # 自定义自带的各类函数
+    'users.views.CustomBackend',
+)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -45,6 +48,7 @@ INSTALLED_APPS = [
     'operation',
     'xadmin',
     'crispy_forms',
+    'captcha',
 ]
 
 AUTH_USER_MODEL = "users.UserProfile"  # 重载方法覆盖默认表
@@ -128,3 +132,14 @@ USE_TZ = False  # 置为False取本地时间，True则取UTC时间
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
+# 邮箱配置
+EMAIL_HOST = "smtp.sina.com"
+EMAIL_PORT = 25
+EMAIL_HOST_USER = "mxonline_robot@sina.com"
+EMAIL_HOST_PASSWORD = "mxonline_root"
+EMAIL_USE_TLS = False
+EMAIL_FROM = "mxonline_robot@sina.com"
