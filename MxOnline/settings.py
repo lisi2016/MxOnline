@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'xadmin',
     'crispy_forms',
     'captcha',
+    'pure_pagination',
 ]
 
 AUTH_USER_MODEL = "users.UserProfile"  # 重载方法覆盖默认表
@@ -77,6 +78,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.core.context_processors.media',  # 将上传目录放到模板里
             ],
         },
     },
@@ -130,7 +132,7 @@ USE_TZ = False  # 置为False取本地时间，True则取UTC时间
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-
+# 静态目录配置
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
@@ -143,3 +145,15 @@ EMAIL_HOST_USER = "mxonline_robot@sina.com"
 EMAIL_HOST_PASSWORD = "mxonline_root"
 EMAIL_USE_TLS = False
 EMAIL_FROM = "mxonline_robot@sina.com"
+
+# 上传文件目录配置
+MEDIA_URL = '/resources/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'resources')
+
+# 分页配置
+PAGINATION_SETTINGS = {
+    'PAGE_RANGE_DISPLAYED': 5,  # 点号中间区域页码数
+    'MARGIN_PAGES_DISPLAYED': 2,  # 点号两侧页码数
+
+    'SHOW_FIRST_PAGE_WHEN_INVALID': True,  # 页面不存在则返回1，False则不做处理
+}
