@@ -173,7 +173,7 @@ class OrgTeacherView(View):
 
 class AddFavView(View):
     """
-    课程机构收藏
+    用户收藏
     """
 
     def post(self, request):

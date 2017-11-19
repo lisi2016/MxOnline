@@ -78,4 +78,4 @@ class UserCourse(models.Model):
         verbose_name_plural = verbose_name
 
     def __unicode__(self):
-        return self.course
+        return "{0}({1})".format(self.user.username, self.course.name)
