@@ -6,9 +6,10 @@ import json
 
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import CourseOrg, CityDict
+from .models import CourseOrg, CityDict, Teacher
 from .forms import UserAskForm
 from operation.models import UserFavorite
+from courses.models import Course
 
 
 # Create your views here.
@@ -199,3 +200,68 @@ class AddFavView(View):
             user_fav.save()
             return HttpResponse(json.dumps({'status': 'success', 'msg': '已收藏'}), content_type="application/json")
         return HttpResponse(json.dumps({'status': 'fail', 'msg': '收藏出错。'}), content_type="application/json")
+
+
+class TeacherListView(View):
+    """
+    讲师列表页面
+    """
+
+    def get(self, request):
+        sort = request.GET.get('sort', '')
+
+        all_teachers = Teacher.objects.all()
+
+        if sort and sort == "hot":
+            all_teachers = all_teachers.order_by("-click_nums")
+
+        sorted_teacher = Teacher.objects.all().order_by("-click_nums")[:3]
+
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        p = Paginator(all_teachers, 1, request=request)
+        teacher_page = p.page(page)
+        return render(request, "teachers-list.html", {
+            "all_teachers": teacher_page,
+            "sort": sort,
+            "sorted_teacher": sorted_teacher,
+        })
+
+
+class TeacherDetailView(View):
+    """
+    讲师详情页
+    """
+
+    def get(self, request, teacher_id):
+        teacher = Teacher.objects.get(id=int(teacher_id))
+        all_courses = Course.objects.filter(teacher=teacher)
+        sorted_teacher = Teacher.objects.all().order_by("-click_nums")[:3]
+
+        # 判断讲师收藏状态
+        if request.user.is_authenticated():
+            if UserFavorite.objects.filter(user=request.user, fav_id=teacher.id, fav_type=3):
+                teacher_fav_status = "已收藏"
+            else:
+                teacher_fav_status = "收藏"
+        else:
+            teacher_fav_status = "登录后收藏"
+
+        # 判断课程机构收藏状态
+        if request.user.is_authenticated():
+            if UserFavorite.objects.filter(user=request.user, fav_id=teacher.org.id, fav_type=2):
+                org_fav_status = "已收藏"
+            else:
+                org_fav_status = "收藏"
+        else:
+            org_fav_status = "登录后收藏"
+
+        return render(request, "teacher-detail.html", {
+            "teacher": teacher,
+            "all_courses": all_courses,
+            "sorted_teacher": sorted_teacher,
+            "teacher_fav_status": teacher_fav_status,
+            "org_fav_status": org_fav_status,
+        })

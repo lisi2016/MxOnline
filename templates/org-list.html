@@ -17,7 +17,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="teachers-list.html">授课教师</a>
+                        <a href="{% url 'org:teacher_list' %}">授课教师</a>
                     </li>
                     <li class="active"><a>授课机构</a></li>
                 </ul>
@@ -141,7 +141,6 @@
                             {% if orgs.has_next %}
                                 <li class="long"><a href="?{{ orgs.next_page_number.querystring }}">下一页</a></li>
                             {% endif %}
-
                         </ul>
                     </div>
                 </div>
