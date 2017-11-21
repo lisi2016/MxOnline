@@ -2,6 +2,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 from django.http import HttpResponse
+from django.db.models import Q
 import json
 
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
@@ -22,9 +23,14 @@ class OrgView(View):
         orgs = CourseOrg.objects.all()  # 授课机构
         hot_orgs = orgs.order_by("click_nums")[:3]  # 热门机构排名
         citys = CityDict.objects.all()  # 城市
+        search_keywords = request.GET.get('keywords', '')
         city_id = request.GET.get('city', '')  # 获取Get的城市id
         category = request.GET.get('cg', '')  # 获取Get的机构类别
         sort = request.GET.get('sort', '')  # 获取Get的参数
+
+        # 机构搜索
+        if search_keywords:
+            orgs = orgs.filter(Q(name__icontains=search_keywords) | Q(desc__icontains=search_keywords))
         if city_id:
             orgs = orgs.filter(city_id=int(city_id))
         if category:
@@ -208,9 +214,16 @@ class TeacherListView(View):
     """
 
     def get(self, request):
+        search_keywords = request.GET.get('keywords', '')
         sort = request.GET.get('sort', '')
 
         all_teachers = Teacher.objects.all()
+
+        # 讲师搜索
+        if search_keywords:
+            all_teachers = all_teachers.filter(Q(name__icontains=search_keywords) |
+                                               Q(work_company__icontains=search_keywords) |
+                                               Q(work_position__icontains=search_keywords))
 
         if sort and sort == "hot":
             all_teachers = all_teachers.order_by("-click_nums")
