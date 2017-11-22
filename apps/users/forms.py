@@ -8,6 +8,8 @@ from django import forms
 
 from captcha.fields import CaptchaField
 
+from .models import UserProfile
+
 
 class RegisterForm(forms.Form):
     """
@@ -40,3 +42,23 @@ class ModifyPwdForm(forms.Form):
     """
     password1 = forms.CharField(required=True, min_length=6, max_length=20)
     password2 = forms.CharField(required=True, min_length=6, max_length=20)
+
+
+class UploadImageForm(forms.ModelForm):
+    """
+    头像上传表单
+    """
+
+    class Meta:
+        model = UserProfile
+        fields = ['image']
+
+
+class UserInfoForm(forms.ModelForm):
+    """
+    个人资料修改表单
+    """
+
+    class Meta:
+        model = UserProfile
+        fields = ['nick_name', 'birthday', 'gender', 'address', 'mobile']
