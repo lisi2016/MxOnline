@@ -6,11 +6,12 @@ from django.db.models import Q
 from django.views.generic.base import View
 from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse
 import json
 
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import UserProfile, EmailVerifyRecord
+from .models import UserProfile, EmailVerifyRecord, Banner
 from .forms import LoginForm, RegisterForm, ForgetForm, ModifyPwdForm, UploadImageForm, UserInfoForm
 from utils.email_send import send_register_email
 from utils.mixin_utils import LoginRequiredMixin
@@ -140,10 +141,11 @@ class LoginView(View):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return render(request, "index.html")
+                    return HttpResponseRedirect(reverse('index'))
                 return render(request, "login.html", {"msg": u"用户还未激活，请登陆注册邮箱激活。"})
             return render(request, "login.html", {"msg": u"用户名或密码错误。"})
         return render(request, "login.html", {"login_form": login_form, "msg": u"请修正上面的错误。"})
+
 
 class LogoutView(View):
     """
@@ -152,9 +154,7 @@ class LogoutView(View):
 
     def get(self, request):
         logout(request)
-        from django.core.urlresolvers import reverse
         return HttpResponseRedirect(reverse('index'))
-
 
 
 class ForgetPwdView(View):
@@ -338,3 +338,33 @@ class MyMessageView(LoginRequiredMixin, View):
         return render(request, 'usercenter-message.html', {
             'message_page': message_page,
         })
+
+
+class IndexView(View):
+    def get(self, request):
+        all_banner = Banner.objects.all().order_by('index')
+        courses = Course.objects.filter(is_banner=False)[:6]
+        banner_courses = Course.objects.filter(is_banner=True)[:3]
+        course_orgs = CourseOrg.objects.all()[:15]
+        return render(request, 'index.html', {
+            'all_banner': all_banner,
+            'courses': courses,
+            'banner_courses': banner_courses,
+            'course_orgs': course_orgs,
+        })
+
+
+def page_not_found(request):
+    # 全局404处理函数
+    from django.shortcuts import render_to_response
+    response = render_to_response('404.html')
+    response.status_code = 404
+    return response
+
+
+def page_error(request):
+    # 全局500处理函数
+    from django.shortcuts import render_to_response
+    response = render_to_response('500.html')
+    response.status_code = 500
+    return response
