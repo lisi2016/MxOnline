@@ -1,11 +1,11 @@
 # -*- coding:utf-8 -*-
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.backends import ModelBackend
 from django.db.models import Q
 from django.views.generic.base import View
 from django.contrib.auth.hashers import make_password
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 import json
 
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
@@ -144,6 +144,17 @@ class LoginView(View):
                 return render(request, "login.html", {"msg": u"用户还未激活，请登陆注册邮箱激活。"})
             return render(request, "login.html", {"msg": u"用户名或密码错误。"})
         return render(request, "login.html", {"login_form": login_form, "msg": u"请修正上面的错误。"})
+
+class LogoutView(View):
+    """
+    用户登出
+    """
+
+    def get(self, request):
+        logout(request)
+        from django.core.urlresolvers import reverse
+        return HttpResponseRedirect(reverse('index'))
+
 
 
 class ForgetPwdView(View):
@@ -314,6 +325,10 @@ class MyMessageView(LoginRequiredMixin, View):
 
     def get(self, request):
         all_messages = UserMessage.objects.filter(user=request.user.id)
+        all_unread_messages = all_messages.filter(has_read=False)
+        for all_unread_message in all_unread_messages:
+            all_unread_message.has_read = True
+            all_unread_message.save()
         try:
             page = request.GET.get('page', 1)
         except PageNotAnInteger:

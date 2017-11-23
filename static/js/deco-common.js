@@ -375,6 +375,7 @@ $(function() {
         var $elem = $('#MsgNum');
         if(!msg){
             clearInterval(m);
+            msg = '';
         }
         if(msg_show){
             $elem.text(msg);
