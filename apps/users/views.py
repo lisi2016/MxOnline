@@ -8,10 +8,15 @@ from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse
 import json
 
+from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
+
 from .models import UserProfile, EmailVerifyRecord
 from .forms import LoginForm, RegisterForm, ForgetForm, ModifyPwdForm, UploadImageForm, UserInfoForm
 from utils.email_send import send_register_email
 from utils.mixin_utils import LoginRequiredMixin
+from operation.models import UserCourse, UserFavorite, UserMessage
+from organization.models import CourseOrg, Teacher
+from courses.models import Course
 
 
 class CustomBackend(ModelBackend):
@@ -107,6 +112,12 @@ class RegisterView(View):
             user_profile.is_active = False
             user_profile.save()
 
+            # 写入注册消息
+            user_message = UserMessage()
+            user_message.user = user_name
+            user_message.message = u"欢迎来到慕学网，这里驻扎有业界大佬，以及大量优秀课程，最后非常感谢您的认可！"
+            user_message.save()
+
             send_register_email(user_name, "register")
             return render(request, "login.html")
         return render(request, "register.html", {"register_form": register_form, "msg": u"请修正上面的错误。"})
@@ -167,7 +178,6 @@ class UserInfoView(LoginRequiredMixin, View):
             user_info_form.save()
             return HttpResponse(json.dumps({'status': 'success'}), content_type="application/json")
         return HttpResponse(json.dumps(user_info_form.errors), content_type="application/json")
-
 
 
 class UploadImageView(LoginRequiredMixin, View):
@@ -232,3 +242,84 @@ class UpdateEmailView(LoginRequiredMixin, View):
             request.user.save()
             return HttpResponse(json.dumps({'status': 'success'}), content_type="application/json")
         return HttpResponse(json.dumps({'email': u"邮箱或验证码错误。"}), content_type="application/json")
+
+
+class MyCourseView(LoginRequiredMixin, View):
+    """
+    我的课程（个人中心）
+    """
+
+    def get(self, request):
+        user_courses = UserCourse.objects.filter(user=request.user)
+        return render(request, 'usercenter-mycourse.html', {
+            'user_courses': user_courses,
+        })
+
+
+class MyFavOrgView(LoginRequiredMixin, View):
+    """
+    我收藏的机构（个人中心）
+    """
+
+    def get(self, request):
+        org_list = []
+        fav_orgs = UserFavorite.objects.filter(user=request.user, fav_type=2)
+        for fav_org in fav_orgs:
+            org_id = fav_org.fav_id
+            org = CourseOrg.objects.get(id=org_id)
+            org_list.append(org)
+        return render(request, 'usercenter-fav-org.html', {
+            'org_list': org_list,
+        })
+
+
+class MyFavTeacherView(LoginRequiredMixin, View):
+    """
+    我收藏的讲师（个人中心）
+    """
+
+    def get(self, request):
+        teacher_list = []
+        fav_teachers = UserFavorite.objects.filter(user=request.user, fav_type=3)
+        for fav_teacher in fav_teachers:
+            teacher_id = fav_teacher.fav_id
+            teacher = Teacher.objects.get(id=teacher_id)
+            teacher_list.append(teacher)
+        return render(request, 'usercenter-fav-teacher.html', {
+            'teacher_list': teacher_list,
+        })
+
+
+class MyFavCourseView(LoginRequiredMixin, View):
+    """
+    我收藏的课程（个人中心）
+    """
+
+    def get(self, request):
+        course_list = []
+        fav_courses = UserFavorite.objects.filter(user=request.user, fav_type=1)
+        for fav_course in fav_courses:
+            course_id = fav_course.fav_id
+            course = Course.objects.get(id=course_id)
+            course_list.append(course)
+        return render(request, 'usercenter-fav-course.html', {
+            'course_list': course_list,
+        })
+
+
+class MyMessageView(LoginRequiredMixin, View):
+    """
+    我的消息
+    """
+
+    def get(self, request):
+        all_messages = UserMessage.objects.filter(user=request.user.id)
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        p = Paginator(all_messages, 5, request=request)
+        message_page = p.page(page)
+        return render(request, 'usercenter-message.html', {
+            'message_page': message_page,
+        })
