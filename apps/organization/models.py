@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 from django.db import models
+from DjangoUeditor.models import UEditorField
 
 
 # Create your models here.
@@ -24,6 +25,8 @@ class CityDict(models.Model):
 class CourseOrg(models.Model):
     name = models.CharField(max_length=50, verbose_name=u"机构名称")
     desc = models.TextField(verbose_name=u"机构描述")
+    detail = UEditorField(verbose_name=u"机构描述", width=600, height=300, imagePath="organizations/ueditor/",
+                          filePath="organizations/ueditor/", default="")
     category = models.CharField(max_length=10, choices=(("pxjg", u"培训机构"), ("gr", u"个人"), ("gx", u"高校")),
                                 default="pxjg", verbose_name=u"机构类别")
     click_nums = models.IntegerField(default=0, verbose_name=u"点击数")
@@ -43,6 +46,10 @@ class CourseOrg(models.Model):
     def get_teacher_nums(self):
         # 统计教师数量
         return self.teacher_set.all().count()
+
+    def get_classic_course(self):
+        # 取经典课程
+        return self.course_set.all().order_by('-students')[:2]
 
     def __unicode__(self):
         return self.name
@@ -67,6 +74,10 @@ class Teacher(models.Model):
 
     def get_course_nums(self):
         return self.course_set.all().count()
+
+    def get_hot_course(self):
+        # 取招牌课程
+        return self.course_set.all().order_by('-students')[:1]
 
     def __unicode__(self):
         return self.name

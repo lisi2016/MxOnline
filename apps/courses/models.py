@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 from django.db import models
+from DjangoUeditor.models import UEditorField
 
 from organization.models import CourseOrg, Teacher
 
@@ -15,7 +16,8 @@ class Course(models.Model):
     teacher = models.ForeignKey(Teacher, verbose_name=u"授课讲师", null=True, blank=True)
     name = models.CharField(max_length=50, verbose_name=u"课程名")
     desc = models.CharField(max_length=300, verbose_name=u"课程描述")
-    detail = models.TextField(verbose_name=u"课程详情")
+    detail = UEditorField(verbose_name=u"课程详情", width=600, height=300, imagePath="courses/ueditor/",
+                          filePath="courses/ueditor/", default="")
     is_banner = models.BooleanField(default=False, verbose_name=u"是否轮播")
     degree = models.CharField(max_length=2, choices=(("cj", u"初级"), ("zj", u"中级"), ("gj", u"高级")), verbose_name=u"课程难度")
     learn_times = models.IntegerField(default=0, verbose_name=u"课程时长（分钟）")
@@ -37,6 +39,8 @@ class Course(models.Model):
         # 获取章节数
         return self.lesson_set.all().count()
 
+    get_zj_nums.short_description = u"章节数"  # 后台列表别名显示
+
     def get_learn_users(self):
         # 获取用户信息
         return self.usercourse_set.all()[:5]
@@ -47,6 +51,13 @@ class Course(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class BannerCourse(Course):
+    class Meta:
+        verbose_name = u"轮播课程"
+        verbose_name_plural = verbose_name
+        proxy = True  # 共用一张表
 
 
 class Lesson(models.Model):

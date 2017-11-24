@@ -50,7 +50,8 @@
                                 <li class="piclist"><span class="pram word4">学习用户：</span>
                                     {% for user_course in course.get_learn_users %}
                                         <span class="pic"><img width="40" height="40"
-                                                               src="{{ MEDIA_URL }}{{ user_course.user.image }}"/></span>
+                                                               src="
+                                                                       {{ MEDIA_URL }}{{ user_course.user.image }}"/></span>
                                     {% endfor %}
                                 </li>
                             </ul>
@@ -58,7 +59,8 @@
                                 <div class="btn colectgroupbtn" id="jsLeftBtn">
                                     {{ course_fav_status }}
                                 </div>
-                                <div class="buy btn"><a style="color: white" href="{% url 'course:course_info' course.id %}">开始学习</a></div>
+                                <div class="buy btn"><a style="color: white"
+                                                        href="{% url 'course:course_info' course.id %}">开始学习</a></div>
                             </div>
                         </div>
                         <div class="group-share-box">
@@ -124,7 +126,9 @@
                         </ul>
                     </div>
                     <div class="tab_cont tab_cont1">
-                        {{ course.detail }}
+                        {% autoescape off %}
+                            {{ course.detail }}
+                        {% endautoescape %}
                     </div>
                     <div class="tab_cont tab_cont2">
                         <div class="comment">

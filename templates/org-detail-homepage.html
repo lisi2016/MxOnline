@@ -19,7 +19,7 @@
     <div class="right companycenter layout grouping">
         <div class="head">
             <h1>全部课程</h1>
-            <a class="green fr more" href="org-detail-course.html">查看更多 > </a>
+            <a class="green fr more" href="{% url 'course:course_list' %}">查看更多 > </a>
         </div>
         <div class="brief group_list">
             {% for course in all_courses %}
@@ -44,7 +44,7 @@
     <div class="right companycenter layout">
         <div class="head">
             <h1>机构教师</h1>
-            <a class="green fr more" href="org-detail-teachers.html">查看更多 > </a>
+            <a class="green fr more" href="{% url 'org:teacher_list' %}">查看更多 > </a>
         </div>
         {% for teacher in all_teachers %}
             <div class="diarys">
@@ -53,15 +53,17 @@
                         <img class="pic" src="{{ MEDIA_URL }}{{ teacher.image }}"/>
                         <p>昵称：{{ teacher.name }}</p>
                     </div>
+                    {% for course in teacher.get_hot_course %}
                     <div class="right">
                         <div class="top">
                             <div class="fl">
-                                <a href=""><h1>java开发教程</h1></a>
-                                <span>发表于：2015-10-12</span>
+                                <a href="{% url 'course:course_detail' course.id %}"><h1>{{ course.name }}</h1></a>
+                                <span>发表于：{{ course.add_time }}</span>
                             </div>
                         </div>
-                        <div class="middle" style="border-bottom:0;">课程介绍</div>
+                        <div class="middle" style="border-bottom:0;">{{ course.desc }}</div>
                     </div>
+                        {% endfor %}
                 </div>
             </div>
         {% endfor %}
@@ -69,9 +71,9 @@
     <div class="right companycenter layout">
         <div class="head">
             <h1>机构介绍</h1>
-            <a class="green fr more" href="org-detail-desc.html">查看更多 > </a>
+            <a class="green fr more" href="{% url 'org:org_desc' course_org.id %}">查看更多 > </a>
         </div>
-        <div class="cont">&nbsp; &nbsp; {{ course_org.desc }}<a href="/company/desc/22/"><span
+        <div class="cont">&nbsp; &nbsp; {{ course_org.desc }}<a href="{% url 'org:org_desc' course_org.id %}"><span
                 class="green">[查看更多]</span></a>
         </div>
     </div>

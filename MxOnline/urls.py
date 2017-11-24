@@ -24,7 +24,9 @@ import xadmin
 
 from users.views import LoginView, RegisterView, ActiveUserView, ForgetPwdView, ResetView, ModifyPwdView, LogoutView, \
     IndexView
-from MxOnline.settings import MEDIA_ROOT, STATIC_ROOT
+from MxOnline.settings import MEDIA_ROOT
+
+# from MxOnline.settings import STATIC_ROOT
 
 urlpatterns = [
     url(r'^xadmin/', xadmin.site.urls),
@@ -42,7 +44,8 @@ urlpatterns = [
     url(r'^course/', include('courses.urls', namespace='course')),  # 课程相关url配置
     url(r'^users/', include('users.urls', namespace='users')),  # 用户相关url配置
     url(r'^resources/(?P<path>.*)$', serve, {"document_root": MEDIA_ROOT}),  # 配置上传文件的访问请求处理
-    url(r'^static/(?P<path>.*)$', serve, {"document_root": STATIC_ROOT}),  # 配置静态文件的访问请求处理（debug为False时）
+    # url(r'^static/(?P<path>.*)$', serve, {"document_root": STATIC_ROOT}),  # 配置静态文件的访问请求处理（debug为False时）
+    url(r'^ueditor/', include('DjangoUeditor.urls')),
 ]
 
 # 全局404配置

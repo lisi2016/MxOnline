@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'extra_apps'))
 SECRET_KEY = 'd6a!5za8%91j&mmi4j-ya$1p7&l=!n5#phm4-^r(-09-6ml4en'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 # 允许连接的IP地址
 ALLOWED_HOSTS = ['*']
 
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'captcha',
     'pure_pagination',
+    'DjangoUeditor',
 ]
 
 AUTH_USER_MODEL = "users.UserProfile"  # 重载方法覆盖默认表
@@ -149,7 +150,7 @@ EMAIL_FROM = "mxonline_robot@sina.com"
 # 上传文件目录配置
 MEDIA_URL = '/resources/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'resources')
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # 分页配置
 PAGINATION_SETTINGS = {

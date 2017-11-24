@@ -47,7 +47,7 @@ class OrgView(View):
             page = request.GET.get('page', 1)
         except PageNotAnInteger:
             page = 1
-        p = Paginator(orgs, 1, request=request)
+        p = Paginator(orgs, 2, request=request)
         org_page = p.page(page)
 
         return render(request, "org-list.html", {
@@ -265,7 +265,7 @@ class TeacherListView(View):
             page = request.GET.get('page', 1)
         except PageNotAnInteger:
             page = 1
-        p = Paginator(all_teachers, 1, request=request)
+        p = Paginator(all_teachers, 2, request=request)
         teacher_page = p.page(page)
         return render(request, "teachers-list.html", {
             "all_teachers": teacher_page,
